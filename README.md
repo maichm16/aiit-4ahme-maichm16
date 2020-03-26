@@ -1,5 +1,5 @@
 # aiit-4ahme-maichm16
-Hier befinden sich alle Java Projekte die im AIIT Unterricht erstellt werden.
+Hier sind alle Java Projekte die im AIIT Unterricht erstellt werden.
 
 ## Urheber
 - Christoph Maier
