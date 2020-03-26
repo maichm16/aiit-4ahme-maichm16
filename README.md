@@ -1,7 +1,7 @@
 # aiit-4ahme-maichm16
 Hier befinden sich alle Java Projekte die im AIIT Unterricht erstellt werden.
 
-## Authors
+## Urheber
 - Christoph Maier
 ## License
-This project is licensed under the MIT License - see the LICENSE.md file for details
+Dieses Projekt ist unter der MIT Lizenz lizenziert - In der [LICENSE.md](https://github.com/maichm16/aiit-4ahme-maichm16/blob/master/LICENSE) Datei finden Sie weitere Details.
