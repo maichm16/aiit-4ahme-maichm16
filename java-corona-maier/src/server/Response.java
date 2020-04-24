@@ -11,11 +11,11 @@ package server;
  */
 public class Response {
     private boolean master;
-    private boolean count;
+    private long count;
     private boolean running;
     private long time;
 
-    public Response(boolean master, boolean count, boolean running, long time) {
+    public Response(boolean master, long count, boolean running, long time) {
         this.master = master;
         this.count = count;
         this.running = running;
