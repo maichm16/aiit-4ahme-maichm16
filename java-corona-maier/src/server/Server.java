@@ -9,9 +9,7 @@ import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -33,18 +31,23 @@ public class Server {
         
         while(true) {
             final Socket socket = serversocket.accept();
-            for(ConnectionHandler h : handlers) {
-                if(h.isClosed()) {
-                    handlers.remove(h);
+            synchronized(handlers) {
+                for(ConnectionHandler h : handlers) {
+                    if(h.isClosed()) {
+                        handlers.remove(h);
+                    }
+                }   
+                if(handlers.size() == 3) {
+                    socket.close();
+                    continue;
                 }
             }
-            if(handlers.size() == 3) {
-            	socket.close();
-                continue;
-            }
+
             final ConnectionHandler handler = new ConnectionHandler(socket);
             new Thread(handler).start();
-            handlers.add(handler);
+            synchronized(handler) {
+                handlers.add(handler);
+            }
         }
     }
     
@@ -85,22 +88,28 @@ public class Server {
         @Override
         public void run() {
             int count = 0;
-
             while(true) {
                 try {
                     final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     final OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
                     final String req = reader.readLine();
+                    if(req == null) {
+                        socket.close();
+                        return;
+                    }
                     count++;
+                    System.out.println(req);
                     final Gson gson = new Gson();
                     final Request r = gson.fromJson(req, Request.class);
 
                     if(r.isMaster()) {
                         boolean setMasterTrue = true;
-                        for(ConnectionHandler h : handlers) {
-                            if(!h.equals(this) && h.isMaster() == true) {
-                                setMasterTrue = false;
-                                break;
+                        synchronized(handlers) {
+                            for(ConnectionHandler h : handlers) {
+                                if(!h.equals(this) && h.isMaster() == true) {
+                                    setMasterTrue = false;
+                                    break;
+                                }
                             }
                         }
                         master = setMasterTrue;
@@ -129,10 +138,9 @@ public class Server {
                         if(r.isEnd()) {
                             serversocket.close();
                             socket.close();
-                            synchronized(socket) {
-                                
+                            synchronized(handlers) {
+                                handlers.remove(this);
                             }
-                            handlers.remove(this);
                             return;
                         }        
                     }
@@ -142,7 +150,6 @@ public class Server {
                     final String respString = gson.toJson(resp);
                     writer.write(respString);
                     writer.flush();
-
                 } catch(Exception ex) {
                     ex.printStackTrace();
                 } 
