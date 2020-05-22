@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 /**
  *
  * @author Christoph-PC
@@ -32,11 +33,13 @@ public class Server {
         while(true) {
             final Socket socket = serversocket.accept();
             synchronized(handlers) {
-                for(ConnectionHandler h : handlers) {
+                for(int i = 0; i < handlers.size(); i++) {
+                    ConnectionHandler h = handlers.get(i);
                     if(h.isClosed()) {
                         handlers.remove(h);
                     }
                 }   
+                
                 if(handlers.size() == 3) {
                     socket.close();
                     continue;
@@ -105,8 +108,9 @@ public class Server {
                     if(r.isMaster()) {
                         boolean setMasterTrue = true;
                         synchronized(handlers) {
-                            for(ConnectionHandler h : handlers) {
-                                if(!h.equals(this) && h.isMaster() == true) {
+                            for(int i = 0; i < handlers.size(); i++) {
+                                ConnectionHandler h = handlers.get(i);
+                                if(h != this && h.isMaster()) {
                                     setMasterTrue = false;
                                     break;
                                 }
@@ -123,7 +127,9 @@ public class Server {
                         if(r.isStop()) {
                             startMillis = 0;
                         } else {
-                            timeOffset = System.currentTimeMillis() - startMillis + timeOffset;
+                            if(isTimerRunning()) {
+                                timeOffset = System.currentTimeMillis() - startMillis + timeOffset;
+                            }  
                         }
 
                         if(r.isClear()) {
@@ -146,12 +152,14 @@ public class Server {
                     }
 
                     //Response
-                    final Response resp = new Response(master, count, isTimerRunning(), getTimerMillis());
+                    final Response resp = new Response(master, count, isTimerRunning(), getTimerMillis(), socket.toString());
                     final String respString = gson.toJson(resp);
                     writer.write(respString);
                     writer.flush();
+                    System.out.println(respString);
                 } catch(Exception ex) {
                     ex.printStackTrace();
+                    return;
                 } 
             }
         }

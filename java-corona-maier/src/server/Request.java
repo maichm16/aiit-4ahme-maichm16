@@ -11,8 +11,8 @@ package server;
  */
 public class Request {
     
-    private boolean  master;
-    private boolean start;
+    private boolean master;
+    private Boolean start;
     private boolean stop;
     private boolean clear;
     private boolean end;
@@ -23,7 +23,7 @@ public class Request {
     }
 
     public boolean isStart() {
-        return start;
+        return start != null && start;
     }
 
     public boolean isStop() {
