@@ -5,6 +5,9 @@
  */
 package client;
 
+import java.awt.Dimension;
+import javax.swing.SwingWorker;
+
 /**
  *
  * @author Christoph-PC
@@ -16,6 +19,9 @@ public class Client extends javax.swing.JFrame {
      */
     public Client() {
         initComponents();
+        setTitle("Stoppuhr");
+        setMinimumSize(new Dimension(300, 350));
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -26,68 +32,121 @@ public class Client extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
+        jPanEast = new javax.swing.JPanel();
+        jPanBtns = new javax.swing.JPanel();
+        jBtnConnect = new javax.swing.JButton();
+        jBtnDisconnect = new javax.swing.JButton();
+        jBtnStart = new javax.swing.JButton();
+        jBtnStop = new javax.swing.JButton();
+        jBtnClear = new javax.swing.JButton();
+        jBtnEnd = new javax.swing.JButton();
         jPanNorth = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jSlider1 = new javax.swing.JSlider();
+        jSlider2 = new javax.swing.JSlider();
         jLabel2 = new javax.swing.JLabel();
         jPanCenter = new javax.swing.JPanel();
-        jPanEast = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        jLabTime = new java.awt.Label();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Refreshrate");
-        jPanNorth.add(jLabel1);
+        jPanBtns.setLayout(new java.awt.GridBagLayout());
 
-        jSlider1.setMaximum(5);
-        jSlider1.setMinimum(1);
-        jSlider1.setToolTipText("");
-        jSlider1.setValue(1);
-        jPanNorth.add(jSlider1);
+        jBtnConnect.setText("Connect");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+        jPanBtns.add(jBtnConnect, gridBagConstraints);
+
+        jBtnDisconnect.setText("Disconnect");
+        jBtnDisconnect.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+        jPanBtns.add(jBtnDisconnect, gridBagConstraints);
+
+        jBtnStart.setText("Start");
+        jBtnStart.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+        jPanBtns.add(jBtnStart, gridBagConstraints);
+
+        jBtnStop.setText("Stop");
+        jBtnStop.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+        jPanBtns.add(jBtnStop, gridBagConstraints);
+
+        jBtnClear.setText("Clear");
+        jBtnClear.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+        jPanBtns.add(jBtnClear, gridBagConstraints);
+
+        jBtnEnd.setText("End");
+        jBtnEnd.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
+        jPanBtns.add(jBtnEnd, gridBagConstraints);
+
+        jPanEast.add(jPanBtns);
+
+        getContentPane().add(jPanEast, java.awt.BorderLayout.LINE_END);
+
+        jPanNorth.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jPanNorth.setLayout(new java.awt.GridBagLayout());
+
+        jLabel1.setText("Refreshrate: 1s");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(9, 9, 9, 9);
+        jPanNorth.add(jLabel1, gridBagConstraints);
+
+        jSlider2.setMaximum(1000);
+        jSlider2.setMinimum(1);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(9, 9, 9, 9);
+        jPanNorth.add(jSlider2, gridBagConstraints);
 
         jLabel2.setText("1ms");
-        jPanNorth.add(jLabel2);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(9, 9, 9, 9);
+        jPanNorth.add(jLabel2, gridBagConstraints);
 
-        getContentPane().add(jPanNorth, java.awt.BorderLayout.PAGE_START);
+        getContentPane().add(jPanNorth, java.awt.BorderLayout.NORTH);
 
-        javax.swing.GroupLayout jPanCenterLayout = new javax.swing.GroupLayout(jPanCenter);
-        jPanCenter.setLayout(jPanCenterLayout);
-        jPanCenterLayout.setHorizontalGroup(
-            jPanCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 334, Short.MAX_VALUE)
-        );
-        jPanCenterLayout.setVerticalGroup(
-            jPanCenterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 392, Short.MAX_VALUE)
-        );
+        jPanCenter.setLayout(new java.awt.GridLayout());
+
+        jLabTime.setAlignment(java.awt.Label.CENTER);
+        jLabTime.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
+        jLabTime.setText("0.000");
+        jPanCenter.add(jLabTime);
 
         getContentPane().add(jPanCenter, java.awt.BorderLayout.CENTER);
-
-        jButton1.setText("jButton1");
-        jPanEast.add(jButton1);
-
-        jButton2.setText("jButton1");
-        jPanEast.add(jButton2);
-
-        jButton3.setText("jButton1");
-        jPanEast.add(jButton3);
-
-        jButton4.setText("jButton1");
-        jPanEast.add(jButton4);
-
-        jButton5.setText("jButton1");
-        jPanEast.add(jButton5);
-
-        jButton6.setText("jButton1");
-        jPanEast.add(jButton6);
-
-        getContentPane().add(jPanEast, java.awt.BorderLayout.EAST);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -128,17 +187,29 @@ public class Client extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
+    private javax.swing.JButton jBtnClear;
+    private javax.swing.JButton jBtnConnect;
+    private javax.swing.JButton jBtnDisconnect;
+    private javax.swing.JButton jBtnEnd;
+    private javax.swing.JButton jBtnStart;
+    private javax.swing.JButton jBtnStop;
+    private java.awt.Label jLabTime;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanBtns;
     private javax.swing.JPanel jPanCenter;
     private javax.swing.JPanel jPanEast;
     private javax.swing.JPanel jPanNorth;
-    private javax.swing.JSlider jSlider1;
+    private javax.swing.JSlider jSlider2;
     // End of variables declaration//GEN-END:variables
+
+    private class Task extends SwingWorker<Object, Object> {
+
+        @Override
+        protected Object doInBackground() throws Exception {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+    }
+ 
 }
