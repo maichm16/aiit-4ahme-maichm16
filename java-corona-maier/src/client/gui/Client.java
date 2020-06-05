@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package client;
+package client.gui;
 
 import java.awt.Dimension;
-import javax.swing.SwingWorker;
+
 
 /**
  *
@@ -54,6 +54,11 @@ public class Client extends javax.swing.JFrame {
         jPanBtns.setLayout(new java.awt.GridBagLayout());
 
         jBtnConnect.setText("Connect");
+        jBtnConnect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnConnectActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
@@ -62,6 +67,11 @@ public class Client extends javax.swing.JFrame {
 
         jBtnDisconnect.setText("Disconnect");
         jBtnDisconnect.setEnabled(false);
+        jBtnDisconnect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnDisconnectActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -72,6 +82,11 @@ public class Client extends javax.swing.JFrame {
 
         jBtnStart.setText("Start");
         jBtnStart.setEnabled(false);
+        jBtnStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnStartActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -82,6 +97,11 @@ public class Client extends javax.swing.JFrame {
 
         jBtnStop.setText("Stop");
         jBtnStop.setEnabled(false);
+        jBtnStop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnStopActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -92,6 +112,11 @@ public class Client extends javax.swing.JFrame {
 
         jBtnClear.setText("Clear");
         jBtnClear.setEnabled(false);
+        jBtnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnClearActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -102,6 +127,11 @@ public class Client extends javax.swing.JFrame {
 
         jBtnEnd.setText("End");
         jBtnEnd.setEnabled(false);
+        jBtnEnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnEndActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -139,7 +169,7 @@ public class Client extends javax.swing.JFrame {
 
         getContentPane().add(jPanNorth, java.awt.BorderLayout.NORTH);
 
-        jPanCenter.setLayout(new java.awt.GridLayout());
+        jPanCenter.setLayout(new java.awt.GridLayout(1, 0));
 
         jLabTime.setAlignment(java.awt.Label.CENTER);
         jLabTime.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
@@ -150,6 +180,30 @@ public class Client extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jBtnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConnectActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jBtnConnectActionPerformed
+
+    private void jBtnDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDisconnectActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jBtnDisconnectActionPerformed
+
+    private void jBtnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStartActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jBtnStartActionPerformed
+
+    private void jBtnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStopActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jBtnStopActionPerformed
+
+    private void jBtnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnClearActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jBtnClearActionPerformed
+
+    private void jBtnEndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEndActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jBtnEndActionPerformed
 
     /**
      * @param args the command line arguments
@@ -203,13 +257,5 @@ public class Client extends javax.swing.JFrame {
     private javax.swing.JSlider jSlider2;
     // End of variables declaration//GEN-END:variables
 
-    private class Task extends SwingWorker<Object, Object> {
-
-        @Override
-        protected Object doInBackground() throws Exception {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-    }
  
 }
