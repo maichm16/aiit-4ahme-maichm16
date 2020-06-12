@@ -30,6 +30,7 @@ public class Server {
     public void start(int port) throws IOException {        
         serversocket = new ServerSocket(port);
         
+        
         while(true) {
             final Socket socket = serversocket.accept();
             synchronized(handlers) {

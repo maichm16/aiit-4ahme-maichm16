@@ -6,37 +6,63 @@
 package client;
 
 import com.google.gson.Gson;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.util.List;
 import javax.swing.SwingWorker;
+import server.Request;
+import server.Response;
 
 /**
  *
  * @author Christoph-PC
  */
-public class ConnectionWorker extends SwingWorker<Object, Object>{
-    private final Socket socket;
+public class ConnectionWorker extends SwingWorker<String, Integer>{
+    private Socket socket;
+
     
-    public ConnectionWorker() {
-        //TODO
+    public ConnectionWorker(String host, int port) throws IOException {
+        socket = new Socket(host, port);
     }
+    
     
     
     @Override
-    protected Object doInBackground() throws Exception {
-        try {
-            final OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
-            final Gson gson = new Gson();
-            
-            
-            
-            
-            
-        } catch(Exception ex) {
-            
-        }
+    protected String doInBackground() throws Exception {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            publish(1);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            publish(2);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+        
+        return "OK";
 
+      
     }
+
+    @Override
+    protected void process(List<Integer> list) {
+        for(Integer r : list) {
+            //gui.handleResponse(r);
+        
+        }
+    }
+    
+    
 
     @Override
     protected void done() {

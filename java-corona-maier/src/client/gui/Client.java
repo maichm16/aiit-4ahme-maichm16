@@ -5,7 +5,14 @@
  */
 package client.gui;
 
+import client.ConnectionWorker;
 import java.awt.Dimension;
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import server.Response;
 
 
 /**
@@ -13,6 +20,7 @@ import java.awt.Dimension;
  * @author Christoph-PC
  */
 public class Client extends javax.swing.JFrame {
+    private MyConnectionWorker worker;
 
     /**
      * Creates new form Client
@@ -22,6 +30,8 @@ public class Client extends javax.swing.JFrame {
         setTitle("Stoppuhr");
         setMinimumSize(new Dimension(300, 350));
         setLocationRelativeTo(null);
+        
+
     }
 
     /**
@@ -182,7 +192,16 @@ public class Client extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBtnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConnectActionPerformed
-        // TODO add your handling code here:
+        try {
+            worker = new MyConnectionWorker("127.0.0.1", 8080);
+            worker.execute();
+            jBtnConnect.setEnabled(false);
+            jBtnDisconnect.setEnabled(true);
+            jBtnStart.setEnabled(true);
+            jBtnEnd.setEnabled(true);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
     }//GEN-LAST:event_jBtnConnectActionPerformed
 
     private void jBtnDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDisconnectActionPerformed
@@ -258,4 +277,33 @@ public class Client extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
  
+    public void handleResponse(Response resp) {
+        
+    }
+    
+    private class MyConnectionWorker extends ConnectionWorker {
+
+        public MyConnectionWorker(String host, int port) throws IOException {
+            super(host, port);
+        }
+
+        @Override
+        protected void done() {
+            try {
+                String erg = get();
+                jLabTime.setText(erg);
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        
+
+        @Override
+        protected void process(List<Integer> list) {
+            for(int i : list) {
+                System.out.println("Process " + i + " " + Thread.currentThread().getId());
+            }
+        }
+    }
 }
