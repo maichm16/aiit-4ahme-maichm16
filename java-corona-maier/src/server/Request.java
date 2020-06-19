@@ -17,6 +17,13 @@ public class Request {
     private boolean clear;
     private boolean end;
     
+    public Request(boolean master, boolean start, boolean stop, boolean clear, boolean end) {
+        this.master = master;
+        this.start = start;
+        this.stop = stop;
+        this.clear = clear;
+        this.end = end;
+    }
 
     public boolean isMaster() {
         return master;

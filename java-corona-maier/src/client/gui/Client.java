@@ -6,12 +6,18 @@
 package client.gui;
 
 import client.ConnectionWorker;
+import com.google.gson.Gson;
 import java.awt.Dimension;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import server.Request;
 import server.Response;
 
 
@@ -21,6 +27,11 @@ import server.Response;
  */
 public class Client extends javax.swing.JFrame {
     private MyConnectionWorker worker;
+    
+    private boolean tryToStart;
+    private boolean tryToStop;
+    private boolean tryToClear;
+    private boolean tryToEnd;
 
     /**
      * Creates new form Client
@@ -54,7 +65,7 @@ public class Client extends javax.swing.JFrame {
         jBtnEnd = new javax.swing.JButton();
         jPanNorth = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jSlider2 = new javax.swing.JSlider();
+        jSliderRefresh = new javax.swing.JSlider();
         jLabel2 = new javax.swing.JLabel();
         jPanCenter = new javax.swing.JPanel();
         jLabTime = new java.awt.Label();
@@ -163,13 +174,13 @@ public class Client extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(9, 9, 9, 9);
         jPanNorth.add(jLabel1, gridBagConstraints);
 
-        jSlider2.setMaximum(1000);
-        jSlider2.setMinimum(1);
+        jSliderRefresh.setMaximum(999);
+        jSliderRefresh.setValue(0);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(9, 9, 9, 9);
-        jPanNorth.add(jSlider2, gridBagConstraints);
+        jPanNorth.add(jSliderRefresh, gridBagConstraints);
 
         jLabel2.setText("1ms");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -197,7 +208,6 @@ public class Client extends javax.swing.JFrame {
             worker.execute();
             jBtnConnect.setEnabled(false);
             jBtnDisconnect.setEnabled(true);
-            jBtnStart.setEnabled(true);
             jBtnEnd.setEnabled(true);
         } catch(Exception ex) {
             ex.printStackTrace();
@@ -205,23 +215,29 @@ public class Client extends javax.swing.JFrame {
     }//GEN-LAST:event_jBtnConnectActionPerformed
 
     private void jBtnDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDisconnectActionPerformed
-        // TODO add your handling code here:
+        worker.cancel(true);
+        jBtnConnect.setEnabled(true);
+        jBtnDisconnect.setEnabled(false);
+        jBtnStart.setEnabled(false);
+        jBtnStop.setEnabled(false);
+        jBtnClear.setEnabled(false);
+        jBtnEnd.setEnabled(false);
     }//GEN-LAST:event_jBtnDisconnectActionPerformed
 
     private void jBtnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStartActionPerformed
-        // TODO add your handling code here:
+        tryToStart = true;
     }//GEN-LAST:event_jBtnStartActionPerformed
 
     private void jBtnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStopActionPerformed
-        // TODO add your handling code here:
+        tryToStop = true;
     }//GEN-LAST:event_jBtnStopActionPerformed
 
     private void jBtnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnClearActionPerformed
-        // TODO add your handling code here:
+        tryToClear = true;
     }//GEN-LAST:event_jBtnClearActionPerformed
 
     private void jBtnEndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEndActionPerformed
-        // TODO add your handling code here:
+        tryToEnd = true;
     }//GEN-LAST:event_jBtnEndActionPerformed
 
     /**
@@ -273,37 +289,79 @@ public class Client extends javax.swing.JFrame {
     private javax.swing.JPanel jPanCenter;
     private javax.swing.JPanel jPanEast;
     private javax.swing.JPanel jPanNorth;
-    private javax.swing.JSlider jSlider2;
+    private javax.swing.JSlider jSliderRefresh;
     // End of variables declaration//GEN-END:variables
 
- 
-    public void handleResponse(Response resp) {
-        
-    }
+
     
-    private class MyConnectionWorker extends ConnectionWorker {
+    private class MyConnectionWorker extends ConnectionWorker { 
+        private Response resp;
+        private Socket socket;
 
+    
         public MyConnectionWorker(String host, int port) throws IOException {
-            super(host, port);
+            socket = new Socket(host, port);
         }
+        
 
         @Override
-        protected void done() {
-            try {
-                String erg = get();
-                jLabTime.setText(erg);
-            } catch(Exception ex) {
-                ex.printStackTrace();
+        protected String doInBackground() throws Exception {
+            final Gson g = new Gson();
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            final OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
+            while(true) {
+                try {                
+                    final Request resq = new Request(true, tryToStart, tryToStop, tryToClear, tryToEnd);
+                    final String resqString = g.toJson(resq);
+                    writer.write(resqString);
+                    writer.flush();
+                    
+                    tryToStart = false;
+                    tryToStop = false;
+                    tryToClear = false;
+                    tryToEnd = false;
+                    
+
+                    final String respString = reader.readLine();
+                    resp = g.fromJson(respString, Response.class);
+                    publish(resp);
+
+                    Thread.sleep(1000 - jSliderRefresh.getValue());
+                } catch(Exception ex ){
+                    ex.printStackTrace();
+                }
             }
         }
 
         
+        
 
         @Override
-        protected void process(List<Integer> list) {
-            for(int i : list) {
-                System.out.println("Process " + i + " " + Thread.currentThread().getId());
+        protected void process(List<Response> list) {
+            Response resp = list.get(0);
+            
+            if(resp.isMaster()) {
+                jBtnConnect.setEnabled(false);
+                jBtnDisconnect.setEnabled(true);
+                jBtnStart.setEnabled(true);
+                jBtnStop.setEnabled(true);
+                jBtnClear.setEnabled(true);
+                jBtnEnd.setEnabled(true);
+            } else {
+                jBtnConnect.setEnabled(false);
+                jBtnDisconnect.setEnabled(true);
+                jBtnStart.setEnabled(false);
+                jBtnStop.setEnabled(false);
+                jBtnClear.setEnabled(false);
+                jBtnEnd.setEnabled(false);
             }
+            
+            if(resp.isRunning()) {
+                jBtnStart.setEnabled(false);
+                jLabTime.setText(String.format("%.3f", resp.getTime()));
+            }
+            
+            
         }
     }
 }
