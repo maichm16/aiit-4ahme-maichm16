@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import server.Request;
 import server.Response;
 
@@ -210,7 +211,7 @@ public class Client extends javax.swing.JFrame {
             jBtnDisconnect.setEnabled(true);
             jBtnEnd.setEnabled(true);
         } catch(Exception ex) {
-            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Konnte nicht mit dem Server verbinden", "Fehler", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jBtnConnectActionPerformed
 
@@ -295,7 +296,6 @@ public class Client extends javax.swing.JFrame {
 
     
     private class MyConnectionWorker extends ConnectionWorker { 
-        private Response resp;
         private Socket socket;
 
     
@@ -309,7 +309,7 @@ public class Client extends javax.swing.JFrame {
             final Gson g = new Gson();
             final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             final OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
-            while(true) {
+            while(!isCancelled()) {
                 try {                
                     final Request resq = new Request(true, tryToStart, tryToStop, tryToClear, tryToEnd);
                     final String resqString = g.toJson(resq);
@@ -323,7 +323,7 @@ public class Client extends javax.swing.JFrame {
                     
 
                     final String respString = reader.readLine();
-                    resp = g.fromJson(respString, Response.class);
+                    final Response resp = g.fromJson(respString, Response.class);
                     publish(resp);
 
                     Thread.sleep(1000 - jSliderRefresh.getValue());
@@ -331,6 +331,7 @@ public class Client extends javax.swing.JFrame {
                     ex.printStackTrace();
                 }
             }
+            return "finished";
         }
 
         
@@ -338,30 +339,47 @@ public class Client extends javax.swing.JFrame {
 
         @Override
         protected void process(List<Response> list) {
-            Response resp = list.get(0);
-            
-            if(resp.isMaster()) {
-                jBtnConnect.setEnabled(false);
-                jBtnDisconnect.setEnabled(true);
-                jBtnStart.setEnabled(true);
-                jBtnStop.setEnabled(true);
-                jBtnClear.setEnabled(true);
-                jBtnEnd.setEnabled(true);
-            } else {
-                jBtnConnect.setEnabled(false);
-                jBtnDisconnect.setEnabled(true);
-                jBtnStart.setEnabled(false);
-                jBtnStop.setEnabled(false);
-                jBtnClear.setEnabled(false);
-                jBtnEnd.setEnabled(false);
+            for(Response r : list) {
+                if(r.isMaster()) {
+                    jBtnConnect.setEnabled(false);
+                    jBtnDisconnect.setEnabled(true);
+                    jBtnStart.setEnabled(true);
+                    jBtnStop.setEnabled(true);
+                    jBtnClear.setEnabled(true);
+                    jBtnEnd.setEnabled(true);
+                } else {
+                    jBtnConnect.setEnabled(false);
+                    jBtnDisconnect.setEnabled(true);
+                    jBtnStart.setEnabled(false);
+                    jBtnStop.setEnabled(false);
+                    jBtnClear.setEnabled(false);
+                    jBtnEnd.setEnabled(false);
+                }
+
+                if(r.isRunning()) {
+                    jBtnStart.setEnabled(false);
+                    jBtnStop.setEnabled(true);
+                    jBtnClear.setEnabled(true);
+                } else {
+                    jBtnStart.setEnabled(true);
+                    jBtnStop.setEnabled(false);
+                    jBtnClear.setEnabled(false);                    
+                }
+                
+                
+                
+                jLabTime.setText(String.format("%.3f", r.getTime()));
             }
-            
-            if(resp.isRunning()) {
-                jBtnStart.setEnabled(false);
-                jLabTime.setText(String.format("%.3f", resp.getTime()));
-            }
-            
-            
         }
+
+        @Override
+        protected void done() {
+            try {
+                get();
+            } catch(Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(Client.this, "Unbekannter Fehler", "Fehler", JOptionPane.ERROR_MESSAGE);
+            }
+        }   
     }
 }
