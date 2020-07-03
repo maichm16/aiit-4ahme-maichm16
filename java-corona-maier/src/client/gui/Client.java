@@ -33,6 +33,8 @@ public class Client extends javax.swing.JFrame {
     private boolean tryToStop;
     private boolean tryToClear;
     private boolean tryToEnd;
+    
+    private boolean cancel;
 
     /**
      * Creates new form Client
@@ -205,6 +207,7 @@ public class Client extends javax.swing.JFrame {
 
     private void jBtnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConnectActionPerformed
         try {
+            cancel = false;
             worker = new MyConnectionWorker("127.0.0.1", 8080);
             worker.execute();
             jBtnConnect.setEnabled(false);
@@ -216,7 +219,7 @@ public class Client extends javax.swing.JFrame {
     }//GEN-LAST:event_jBtnConnectActionPerformed
 
     private void jBtnDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDisconnectActionPerformed
-        worker.cancel(true);
+        cancel = true;
         jBtnConnect.setEnabled(true);
         jBtnDisconnect.setEnabled(false);
         jBtnStart.setEnabled(false);
@@ -309,7 +312,7 @@ public class Client extends javax.swing.JFrame {
             final Gson g = new Gson();
             final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             final OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
-            while(!isCancelled()) {
+            while(!cancel) {
                 try {                
                     final Request resq = new Request(true, tryToStart, tryToStop, tryToClear, tryToEnd);
                     final String resqString = g.toJson(resq);
@@ -365,8 +368,6 @@ public class Client extends javax.swing.JFrame {
                     jBtnStop.setEnabled(false);
                     jBtnClear.setEnabled(false);                    
                 }
-                
-                
                 
                 jLabTime.setText(String.format("%.3f", r.getTime()));
             }
