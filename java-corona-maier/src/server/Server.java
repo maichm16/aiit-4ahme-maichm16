@@ -157,11 +157,10 @@ public class Server {
                         }
                     }
 
-
                     //Response
                     final Response resp = new Response(master, count, isTimerRunning(), getTimerMillis(), socket.toString());
                     final String respString = gson.toJson(resp);
-                    writer.write(respString);
+                    writer.write(respString + "\n");
                     writer.flush();
                     System.out.println(respString);
                 } catch(Exception ex) {

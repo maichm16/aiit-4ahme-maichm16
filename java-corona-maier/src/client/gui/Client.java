@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -29,12 +31,9 @@ import server.Response;
 public class Client extends javax.swing.JFrame {
     private MyConnectionWorker worker;
     
-    private boolean tryToStart;
-    private boolean tryToStop;
-    private boolean tryToClear;
-    private boolean tryToEnd;
+
     
-    private boolean cancel;
+
 
     /**
      * Creates new form Client
@@ -71,7 +70,7 @@ public class Client extends javax.swing.JFrame {
         jSliderRefresh = new javax.swing.JSlider();
         jLabel2 = new javax.swing.JLabel();
         jPanCenter = new javax.swing.JPanel();
-        jLabTime = new java.awt.Label();
+        jLabTime = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -179,6 +178,11 @@ public class Client extends javax.swing.JFrame {
 
         jSliderRefresh.setMaximum(999);
         jSliderRefresh.setValue(0);
+        jSliderRefresh.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSliderRefreshStateChanged(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
@@ -195,9 +199,9 @@ public class Client extends javax.swing.JFrame {
 
         jPanCenter.setLayout(new java.awt.GridLayout(1, 0));
 
-        jLabTime.setAlignment(java.awt.Label.CENTER);
-        jLabTime.setFont(new java.awt.Font("Dialog", 1, 48)); // NOI18N
-        jLabTime.setText("0.000");
+        jLabTime.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+        jLabTime.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabTime.setText("0");
         jPanCenter.add(jLabTime);
 
         getContentPane().add(jPanCenter, java.awt.BorderLayout.CENTER);
@@ -207,7 +211,6 @@ public class Client extends javax.swing.JFrame {
 
     private void jBtnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnConnectActionPerformed
         try {
-            cancel = false;
             worker = new MyConnectionWorker("127.0.0.1", 8080);
             worker.execute();
             jBtnConnect.setEnabled(false);
@@ -219,7 +222,7 @@ public class Client extends javax.swing.JFrame {
     }//GEN-LAST:event_jBtnConnectActionPerformed
 
     private void jBtnDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnDisconnectActionPerformed
-        cancel = true;
+        worker.setCancel(true);
         jBtnConnect.setEnabled(true);
         jBtnDisconnect.setEnabled(false);
         jBtnStart.setEnabled(false);
@@ -229,20 +232,32 @@ public class Client extends javax.swing.JFrame {
     }//GEN-LAST:event_jBtnDisconnectActionPerformed
 
     private void jBtnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStartActionPerformed
-        tryToStart = true;
+        if(worker != null) {
+            worker.setTryToStart(true);
+        }
     }//GEN-LAST:event_jBtnStartActionPerformed
 
     private void jBtnStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnStopActionPerformed
-        tryToStop = true;
+        if(worker != null) {
+            worker.setTryToStop(true);
+        }
     }//GEN-LAST:event_jBtnStopActionPerformed
 
     private void jBtnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnClearActionPerformed
-        tryToClear = true;
+        if(worker != null) {
+            worker.setTryToClear(true);
+        }
     }//GEN-LAST:event_jBtnClearActionPerformed
 
     private void jBtnEndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnEndActionPerformed
-        tryToEnd = true;
+        if(worker != null) {
+            worker.setTryToEnd(true);
+        }
     }//GEN-LAST:event_jBtnEndActionPerformed
+
+    private void jSliderRefreshStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSliderRefreshStateChanged
+        worker.setSliderValue(jSliderRefresh.getValue());
+    }//GEN-LAST:event_jSliderRefreshStateChanged
 
     /**
      * @param args the command line arguments
@@ -286,7 +301,7 @@ public class Client extends javax.swing.JFrame {
     private javax.swing.JButton jBtnEnd;
     private javax.swing.JButton jBtnStart;
     private javax.swing.JButton jBtnStop;
-    private java.awt.Label jLabTime;
+    private javax.swing.JLabel jLabTime;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanBtns;
@@ -301,44 +316,9 @@ public class Client extends javax.swing.JFrame {
     private class MyConnectionWorker extends ConnectionWorker { 
         private Socket socket;
 
-    
         public MyConnectionWorker(String host, int port) throws IOException {
-            socket = new Socket(host, port);
+            super(host, port);
         }
-        
-
-        @Override
-        protected String doInBackground() throws Exception {
-            final Gson g = new Gson();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            final OutputStreamWriter writer = new OutputStreamWriter(socket.getOutputStream());
-            while(!cancel) {
-                try {                
-                    final Request resq = new Request(true, tryToStart, tryToStop, tryToClear, tryToEnd);
-                    final String resqString = g.toJson(resq);
-                    writer.write(resqString);
-                    writer.flush();
-                    
-                    tryToStart = false;
-                    tryToStop = false;
-                    tryToClear = false;
-                    tryToEnd = false;
-                    
-
-                    final String respString = reader.readLine();
-                    final Response resp = g.fromJson(respString, Response.class);
-                    publish(resp);
-
-                    Thread.sleep(1000 - jSliderRefresh.getValue());
-                } catch(Exception ex ){
-                    ex.printStackTrace();
-                }
-            }
-            return "finished";
-        }
-
-        
-        
 
         @Override
         protected void process(List<Response> list) {
@@ -369,7 +349,10 @@ public class Client extends javax.swing.JFrame {
                     jBtnClear.setEnabled(false);                    
                 }
                 
-                jLabTime.setText(String.format("%.3f", r.getTime()));
+                
+                int seconds = (int) (r.getTime() / 1000) % 60 ;
+                int minutes = (int) ((r.getTime() / (1000 * 60)) % 60);
+                jLabTime.setText(String.format(("%d:%d"), minutes, seconds));
             }
         }
 
